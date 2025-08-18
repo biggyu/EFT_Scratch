@@ -1,12 +1,17 @@
 // #include <stdio.h>
 // #include <stdlib.h>
+
 #include "shadow_memory.hpp"
-ShadMem smem;
+using namespace std;
+
+// ShadowMemory smem;
+ShadowMemory* smem = new ShadowMemory();
 #define SMEM_STORE(ptr) \
-    smem.on_store((void*)(ptr), static_cast<double>(*(ptr)), fp_op::STORE, __LINE__);
+    smem->on_store((void*)(ptr), static_cast<double>(*(ptr)), fp_op::STORE, __LINE__, nullptr, nullptr);
 #define SMEM_LOAD(ptr, value) \
-    smem.on_store((void*)(ptr), static_cast<double>(value), fp_op::LOAD, __LINE__);
-#define SMEM_DUMP() smem.dump_summary();
+    smem->on_load((void*)(ptr), static_cast<double>(value), fp_op::LOAD, __LINE__);
+#define SMEM_DUMP() \
+    smem->dump_summary("ShadowMemory Summary");
 
 int main() {
     int dim = 3;

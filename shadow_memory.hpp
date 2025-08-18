@@ -4,7 +4,7 @@
 #include <iostream>
 #include <cstdio>
 #include <cstdint>
-#include <unordered_map>
+#include <map>
 using namespace std;
 
 enum class fp_op : uint32_t { INIT, LOAD, STORE, ADD, SUB, MUL, DIV, UNKNOWN };
@@ -20,17 +20,17 @@ struct smem_entry {
 };
 
 
-class ShadMem {
+class ShadowMemory {
     public:
-        ShadMem();
-        smem_entry& on_store(void* addr, double value, fp_op op = fp_op::STORE, size_t linenum = 0, smem_entry* lhs = nullptr, smem_entry* rhs = nullptr);
-        smem_entry& on_load(void* addr, double program_value, fp_op op = fp_op::LOAD, size_t linenum = 0);
+        ShadowMemory();
+        smem_entry& on_store(void* addr, double value, fp_op op, size_t linenum, smem_entry* lhs, smem_entry* rhs);
+        smem_entry& on_load(void* addr, double program_value, fp_op op, size_t linenum);
         // bool has(void* addr);
-        void dump_summary(const char* header = "Shadow memory summary");
+        void dump_summary(const char* header);
         
     private:
         // static uintptr_t key(void* p) { return reinterpret_cast<uintptr_t>(p); }
-        unordered_map<uintptr_t, smem_entry> table;
-        size_t timestamp = 0;
-}
+        map<uintptr_t, smem_entry> table;
+        size_t gloabl_ts_ = 0;
+};  
 #endif

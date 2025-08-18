@@ -26,7 +26,7 @@ class ShadowMemory {
         smem_entry& on_store(void* addr, double value, fp_op op, size_t linenum, smem_entry* lhs, smem_entry* rhs);
         smem_entry& on_load(void* addr, double program_value, fp_op op, size_t linenum);
         // bool has(void* addr);
-        void dump_summary(const char* header);
+        void dump_summary(const char* header) const;
         
     private:
         // static uintptr_t key(void* p) { return reinterpret_cast<uintptr_t>(p); }

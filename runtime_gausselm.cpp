@@ -6,16 +6,6 @@ using namespace std;
 
 // ShadowMemory smem;
 ShadowMemory* smem = new ShadowMemory();
-// #define SMEM_STORE(ptr) \
-//     smem->on_store((void*)(ptr), static_cast<double>(*(ptr)), fp_op::STORE, __LINE__, nullptr, nullptr);
-// #define SMEM_LOAD(ptr, value) \
-//     do {
-//         auto tmp = *(ptr); \
-//         smem->on_load((void*)(ptr), (double)(tmp), fp_op::LOAD, __LINE__); \
-//         value = tmp;
-//     } while(0)
-#define SMEM_DUMP() \
-    smem->dump_summary("ShadowMemory Summary");
 
 template<typename T>
 inline void SMemStore(T* ptr, ShadowMemory* smem, size_t linenum) {
@@ -28,6 +18,10 @@ inline T SMemLoad(T* ptr, ShadowMemory* smem, size_t linenum) {
   T v = *ptr;
   smem->on_load((void*)ptr, (double)v, fp_op::LOAD, linenum);
   return v;
+}
+
+inline void SMemDump() {
+    smem->dump_summary();
 }
 
 int main() {
@@ -156,6 +150,6 @@ int main() {
         printf("\t%f\n", x[i]);
         // printf("\n");
     }
-    SMEM_DUMP();
+    SMemDump();
     return 0;
 }

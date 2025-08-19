@@ -1,9 +1,5 @@
 #include "shadow_memory.hpp"
 
-// ShadowMemory::ShadowMemory() {
-//     ShadowMemory::gloabl_ts_ = 0;
-// }
-
 smem_entry& ShadowMemory::on_store(void* addr, double value, fp_op op = fp_op::STORE, size_t linenum = 0) {
     auto& e = table[reinterpret_cast<uintptr_t>(addr)];
     e.value = value;
@@ -33,18 +29,20 @@ smem_entry& ShadowMemory::on_load(void* addr, double program_value, fp_op op = f
     }
 }
 
-void ShadowMemory::dump_summary(const char* header = "Shadow memory summary") const {
-    printf("=== %s ===\n", header);
+void ShadowMemory::dump_summary() const {
+    printf("=== Shadow memory summary ===\n");
     printf("entries: %zu\n", table.size());
     size_t count = 0;
     for (auto& kv : table) {
         const auto& e = kv.second;
         printf("  addr=0x%zx\tvalue=%20.17g\terr=%.3e\tln=%zu\n",
                     kv.first, e.value, e.error, e.linenum);
-        // printf("  addr=0x%zx\tvalue=%.17g\terr=%.3e\tts=%zu\n",
-        //             kv.first, e.value, e.error, e.timestamp);
     }
 }
+
+// ShadowMemory::ShadowMemory() {
+//     ShadowMemory::gloabl_ts_ = 0;
+// }
 
 // smem_entry& ShadowMemory::on_store(void* addr, double value, fp_op op = fp_op::STORE, size_t linenum = 0, smem_entry* lhs = nullptr, smem_entry* rhs = nullptr) {
 //     auto& e = table[reinterpret_cast<uintptr_t>(addr)];
@@ -72,5 +70,16 @@ void ShadowMemory::dump_summary(const char* header = "Shadow memory summary") co
 //         e.lhs = nullptr;
 //         e.rhs = nullptr;
 //         return e;
+//     }
+// }
+
+// void ShadowMemory::dump_summary(const char* header = "Shadow memory summary") const {
+//     printf("=== %s ===\n", header);
+//     printf("entries: %zu\n", table.size());
+//     size_t count = 0;
+//     for (auto& kv : table) {
+//         const auto& e = kv.second;
+//         printf("  addr=0x%zx\tvalue=%.17g\terr=%.3e\tln=%zu\tts=%zu\n",
+//                     kv.first, e.value, e.error, e.linenum, e.timestamp);
 //     }
 // }

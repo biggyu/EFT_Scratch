@@ -2,6 +2,7 @@
 #define __SHADOW_MEMORY_H__
 #pragma once
 #include <iostream>
+#include <iomanip>
 #include <cstdio>
 #include <cstdint>
 #include <map>

@@ -8,19 +8,19 @@ using namespace std;
 ShadowMemory* smem = new ShadowMemory();
 
 template<typename T>
-inline void SMemStore(T* ptr, ShadowMemory* smem, size_t linenum) {
+void SMemStore(T* ptr, ShadowMemory* smem, size_t linenum) {
     // smem->on_store((void*)ptr, *(ptr), fp_op::STORE, __LINE__, nullptr, nullptr);
     smem->on_store((void*)ptr, *(ptr), fp_op::STORE, linenum);
 }
 
 template <typename T>
-inline T SMemLoad(T* ptr, ShadowMemory* smem, size_t linenum) {
+T SMemLoad(T* ptr, ShadowMemory* smem, size_t linenum) {
   T v = *ptr;
   smem->on_load((void*)ptr, (double)v, fp_op::LOAD, linenum);
   return v;
 }
 
-inline void SMemDump() {
+void SMemDump() {
     smem->dump_summary();
 }
 

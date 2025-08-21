@@ -1,0 +1,85 @@
+#ifndef __TEMP_MTA_SPACE_H__
+#define __TEMP_MTA_SPACE_H__
+#pragma once
+#include <cmath>
+#include <cstdint>
+#include <map>
+#include "shadow_memory.hpp"
+
+using namespace std;
+void TwoSum(double a, double b, double& x, double &dx);
+void PropSumError(double a, double da, double b, double db, double& x, double& dx);
+void TwoProd(double a, double b, double& x, double& dx);
+void PropProdError(double a, double da, double b, double db, double& x, double& dx);
+void TwoDiv(double a, double b, double& x, double& dx);
+void PropDivError(double a, double da, double b, double db, double& x, double& dx);
+
+struct tms_entry{
+    // mpfr_t val;
+    double error;
+    double value;
+
+    size_t linenum;
+    enum fp_op opcode;
+    // bool is_init;
+
+    // size_t lock;
+    // size_t key;
+
+    // size_t op1_lock;
+    // size_t op1_key;
+    struct tms_entry* lhs;
+
+    // size_t op2_lock;
+    // size_t op2_key;
+    struct tms_entry* rhs;
+    size_t timestamp;
+    size_t static_id;
+};
+
+class TmpMtaSpc {
+    public:
+        TmpMtaSpc(size_t cap_);
+        ~TmpMtaSpc();
+        void alloc();
+        void inc_ts();
+    private:
+        size_t cap;
+        TmpMtaSpc* circ_queue;
+        size_t head;
+        size_t global_ts;
+
+}
+
+struct lwrm_value {
+    tms_entry* addr;
+    size_t ts;
+}
+
+using LstWrtMap = map<size_t, lwrm_value>;
+
+size_t inst_id_hash();
+#define SITE_ID() site_id()
+
+struct TempContext {
+    ShadowMemory* smem;
+    TmpMtaSpc queue;
+    LstWrtMap lwm;
+
+    explicit TempContext(ShadowMemory* s, size_t cap=256) : smem(s), queue(cap) {}
+};
+
+
+tms_entry* t_const(double v, TempContext& ctx, size_t site_id, size_t linenum);
+tms_entry* t_add(tms_entry* x, tms_entry* y, TempContext& ctx, size_t site_id, size_t linenum);
+tms_entry* t_sub(tms_entry* x, tms_entry* y, TempContext& ctx, size_t site_id, size_t linenum);
+tms_entry* t_mul(tms_entry* x, tms_entry* y, TempContext& ctx, size_t site_id, size_t linenum);
+tms_entry* t_div(tms_entry* x, tms_entry* y, TempContext& ctx, size_t site_id, size_t linenum);
+void t_store(void* addr, double program_value, TempContext& ctx, size_t site_id, size_t linenum);
+tms_entry* t_load(void* addr, double program_value, TempContext& ctx, size_t site_id, size_t linenum);
+
+// bool valid_operand(tms_entry* e, const LastWriteInfo& lwi) {
+//     return e && (e->timestamp == lwi.ts);
+// }
+
+#endif

@@ -16,16 +16,16 @@ struct smem_entry {
     // size_t timestamp;
     fp_op opcode;
     size_t linenum;
-    // smem_entry* lhs;
-    // smem_entry* rhs;
+    smem_entry* lhs;
+    smem_entry* rhs;
 };
 
 
 class ShadowMemory {
     public:
         // ShadowMemory();
-        // smem_entry& on_store(void* addr, double value, fp_op op, size_t linenum, smem_entry* lhs, smem_entry* rhs);
-        smem_entry& on_store(void* addr, double value, fp_op op, size_t linenum);
+        smem_entry& on_store(void* addr, double value, fp_op op, size_t linenum, smem_entry* lhs, smem_entry* rhs);
+        // smem_entry& on_store(void* addr, double value, fp_op op, size_t linenum);
         smem_entry& on_load(void* addr, double program_value, fp_op op, size_t linenum);
         void dump_summary() const;
         

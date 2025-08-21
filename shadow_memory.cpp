@@ -4,15 +4,15 @@
 //     ShadowMemory::gloabl_ts_ = 0;
 // }
 
-smem_entry& ShadowMemory::on_store(void* addr, double value, fp_op op = fp_op::STORE, size_t linenum = 0) {
+smem_entry& ShadowMemory::on_store(void* addr, double value, fp_op op = fp_op::STORE, size_t linenum = 0, smem_entry* lhs = nullptr, smem_entry* rhs = nullptr) {
     auto& e = table[reinterpret_cast<uintptr_t>(addr)];
     e.value = value;
     e.error = 0.0;
     // e.timestamp = ++gloabl_ts_;
     e.opcode = op;
     e.linenum = linenum;
-    // e.lhs = lhs;
-    // e.rhs = rhs;
+    e.lhs = lhs;
+    e.rhs = rhs;
     return e;
 }
 

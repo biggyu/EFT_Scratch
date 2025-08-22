@@ -97,7 +97,7 @@ tms_entry* t_add(tms_entry* a, tms_entry* b, TempContext& ctx, size_t site_id, s
         b_error = 0.0;
     }
     double x, dx;
-    PropSumError(a->value, b->value, x, dx);
+    PropSumError(a->value, a_error, b->value, b_error, x, dx);
 
     z->value = x;
     z->error = dx;
@@ -131,7 +131,7 @@ tms_entry* t_sub(tms_entry* a, tms_entry* b, TempContext& ctx, size_t site_id, s
         b_error = 0.0;
     }
     double x, dx;
-    PropSumError(a->value, -b->value, x, dx);
+    PropSumError(a->value, a_error, -b->value, b_error, x, dx);
 
     z->value = x;
     z->error = dx;
@@ -166,7 +166,7 @@ tms_entry* t_mul(tms_entry* a, tms_entry* b, TempContext& ctx, size_t site_id, s
         b_error = 0.0;
     }
     double x, dx;
-    PropProdError(a->value, b->value, x, dx);
+    PropProdError(a->value, a_error, b->value, b_error, x, dx);
 
     z->value = x;
     z->error = dx;
@@ -201,7 +201,7 @@ tms_entry* t_div(tms_entry* a, tms_entry* b, TempContext& ctx, size_t site_id, s
         b_error = 0.0;
     }
     double x, dx;
-    PropDivError(a->value, b->value, x, dx);
+    PropDivError(a->value, a_error, b->value, b_error, x, dx);
 
     z->value = x;
     z->error = dx;

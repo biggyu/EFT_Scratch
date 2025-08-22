@@ -41,26 +41,26 @@ class TmpMtaSpc {
     public:
         TmpMtaSpc(size_t cap_);
         ~TmpMtaSpc();
-        void alloc();
+        tms_entry* alloc();
         void inc_ts();
         size_t get_ts();
     private:
         size_t cap;
-        TmpMtaSpc* circ_queue;
+        tms_entry* circ_queue;
         size_t head;
         size_t global_ts;
 
-}
+};
 
 struct lwrm_value {
     tms_entry* addr;
     size_t ts;
-}
+};
 
 using LstWrtMap = map<size_t, lwrm_value>;
 
 size_t inst_id_hash(const char* file, int line, const char* func);
-#define SITE_ID() site_id(__FILE__, __LINE__, __func__)
+#define SITE_ID() inst_id_hash(__FILE__, __LINE__, __func__)
 
 struct TempContext {
     ShadowMemory* smem;

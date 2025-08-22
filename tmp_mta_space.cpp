@@ -36,7 +36,9 @@ void PropDivError(double a, double da, double b, double db, double& x, double& d
 
 
 
-TmpMtaSpc::TmpMtaSpc(size_t cap_ = 256) cap(cap_), circ_queue(new tms_entry[cap_]) {
+TmpMtaSpc::TmpMtaSpc(size_t cap_ = 256) {
+    cap = cap_;
+    circ_queue = new tms_entry[cap_];
     head = 0;
     global_ts = 0;
 }
@@ -45,8 +47,8 @@ TmpMtaSpc::~TmpMtaSpc() {
     delete[] circ_queue;
 }
 
-void TmpMtaSpc::alloc() {
-    tms_entry* t = &q_[head];
+tms_entry* TmpMtaSpc::alloc() {
+    tms_entry* t = &circ_queue[head];
     head = (head + 1) % cap;
     t->timestamp = ++global_ts;
     return t;
@@ -55,7 +57,7 @@ void TmpMtaSpc::inc_ts() {
     global_ts++;
 }
 
-void TmpMtaSpc::get_ts() {
+size_t TmpMtaSpc::get_ts() {
     return global_ts;
 }
 
@@ -64,25 +66,26 @@ size_t inst_id_hash(const char* file, int line, const char* func) {
     return std::hash<std::string>{}(key);
 }
 
-tms_entry* t_const(double program_value, TempContext& ctx, size_t site_id, size_t linenum) {
+template<typename T>
+tms_entry* t_const(T program_value, TempContext& ctx, size_t site_id, size_t linenum) {
     tms_entry* t = ctx.queue.alloc();
     t->error = 0.0;
-    t->value = program_value;
+    t->value = static_cast<double>(program_value);
     t->lhs = nullptr;
     t->rhs = nullptr;
     t->opcode = fp_op::INIT;
     t->linenum = linenum;
-    t->site_id = site_id;
+    t->static_id = site_id;
     ctx.lwm[site_id] = {t, t->timestamp};
     return t;
 }
 
 tms_entry* t_add(tms_entry* a, tms_entry* b, TempContext& ctx, size_t site_id, size_t linenum) {
     tms_entry* z = ctx.queue.alloc();
-    tms_entry* a_addr = ctx.lwm[a->site_id].addr;
-    size_t a_ts = ctx.lwm[a->site_id].ts;
-    tms_entry* b_addr = ctx.lwm[b->site_id].addr;
-    size_t b_ts = ctx.lwm[b->site_id].ts;
+    tms_entry* a_addr = ctx.lwm[a->static_id].addr;
+    size_t a_ts = ctx.lwm[a->static_id].ts;
+    tms_entry* b_addr = ctx.lwm[b->static_id].addr;
+    size_t b_ts = ctx.lwm[b->static_id].ts;
     double a_error, b_error;
     if(a_ts == a_addr->timestamp) {
         z->lhs = a_addr;
@@ -107,16 +110,16 @@ tms_entry* t_add(tms_entry* a, tms_entry* b, TempContext& ctx, size_t site_id, s
     z->error = dx;
     z->opcode = fp_op::ADD;
     z->linenum = linenum;
-    z->site_id = site_id;
-    ctx.lwr[site_id] = {z, z->timestamp};
+    z->static_id = site_id;
+    ctx.lwm[site_id] = {z, z->timestamp};
     return z;
 }
 tms_entry* t_sub(tms_entry* a, tms_entry* b, TempContext& ctx, size_t site_id, size_t linenum) {
     tms_entry* z = ctx.queue.alloc();
-    tms_entry* a_addr = ctx.lwm[a->site_id].addr;
-    size_t a_ts = ctx.lwm[a->site_id].ts;
-    tms_entry* b_addr = ctx.lwm[b->site_id].addr;
-    size_t b_ts = ctx.lwm[b->site_id].ts;
+    tms_entry* a_addr = ctx.lwm[a->static_id].addr;
+    size_t a_ts = ctx.lwm[a->static_id].ts;
+    tms_entry* b_addr = ctx.lwm[b->static_id].addr;
+    size_t b_ts = ctx.lwm[b->static_id].ts;
     double a_error, b_error;
     if(a_ts == a_addr->timestamp) {
         z->lhs = a_addr;
@@ -141,17 +144,17 @@ tms_entry* t_sub(tms_entry* a, tms_entry* b, TempContext& ctx, size_t site_id, s
     z->error = dx;
     z->opcode = fp_op::SUB;
     z->linenum = linenum;
-    z->site_id = site_id;
-    ctx.lwr[site_id] = {z, z->timestamp};
+    z->static_id = site_id;
+    ctx.lwm[site_id] = {z, z->timestamp};
     return z;
 }
 
 tms_entry* t_mul(tms_entry* a, tms_entry* b, TempContext& ctx, size_t site_id, size_t linenum) {
     tms_entry* z = ctx.queue.alloc();
-    tms_entry* a_addr = ctx.lwm[a->site_id].addr;
-    size_t a_ts = ctx.lwm[a->site_id].ts;
-    tms_entry* b_addr = ctx.lwm[b->site_id].addr;
-    size_t b_ts = ctx.lwm[b->site_id].ts;
+    tms_entry* a_addr = ctx.lwm[a->static_id].addr;
+    size_t a_ts = ctx.lwm[a->static_id].ts;
+    tms_entry* b_addr = ctx.lwm[b->static_id].addr;
+    size_t b_ts = ctx.lwm[b->static_id].ts;
     double a_error, b_error;
     if(a_ts == a_addr->timestamp) {
         z->lhs = a_addr;
@@ -176,17 +179,17 @@ tms_entry* t_mul(tms_entry* a, tms_entry* b, TempContext& ctx, size_t site_id, s
     z->error = dx;
     z->opcode = fp_op::MUL;
     z->linenum = linenum;
-    z->site_id = site_id;
-    ctx.lwr[site_id] = {z, z->timestamp};
+    z->static_id = site_id;
+    ctx.lwm[site_id] = {z, z->timestamp};
     return z;
 }
 
 tms_entry* t_div(tms_entry* a, tms_entry* b, TempContext& ctx, size_t site_id, size_t linenum) {
     tms_entry* z = ctx.queue.alloc();
-    tms_entry* a_addr = ctx.lwm[a->site_id].addr;
-    size_t a_ts = ctx.lwm[a->site_id].ts;
-    tms_entry* b_addr = ctx.lwm[b->site_id].addr;
-    size_t b_ts = ctx.lwm[b->site_id].ts;
+    tms_entry* a_addr = ctx.lwm[a->static_id].addr;
+    size_t a_ts = ctx.lwm[a->static_id].ts;
+    tms_entry* b_addr = ctx.lwm[b->static_id].addr;
+    size_t b_ts = ctx.lwm[b->static_id].ts;
     double a_error, b_error;
     if(a_ts == a_addr->timestamp) {
         z->lhs = a_addr;
@@ -211,8 +214,8 @@ tms_entry* t_div(tms_entry* a, tms_entry* b, TempContext& ctx, size_t site_id, s
     z->error = dx;
     z->opcode = fp_op::DIV;
     z->linenum = linenum;
-    z->site_id = site_id;
-    ctx.lwr[site_id] = {z, z->timestamp};
+    z->static_id = site_id;
+    ctx.lwm[site_id] = {z, z->timestamp};
     return z;
 }
 
@@ -220,21 +223,21 @@ void t_store(void* addr, tms_entry* y, TempContext& ctx, size_t site_id, size_t 
     *reinterpret_cast<float*>(addr) = static_cast<float>(y->value); //TODO: use Template for generalization
 
     smem_entry& m = ctx.smem->on_store(addr, y->value, fp_op::STORE, linenum, nullptr, nullptr);
-    m.error = y_addr->error;
-    m.lhs = y_addr->lhs;
-    m.rhs = y_addr->rhs;
+    m.error = y->error;
+    m.lhs = y->lhs; //!
+    m.rhs = y->rhs; //!
     ctx.queue.inc_ts();
 }
 
 tms_entry* t_load(void* addr, TempContext& ctx, size_t site_id, size_t linenum) {
     double v = static_cast<double>(*reinterpret_cast<float*>(addr)); //TODO: use Template for generalization
-    smem_entry* s = ctx->smem->peek(addr);
+    const smem_entry* s = ctx.smem->peek(addr);
 
     tms_entry* y = ctx.queue.alloc();
     // smem_entry& m = ctx.smem->on_load(addr, program_value, fp_op::LOAD, linenum);
     if(s->value == v) {
-        y->error = s->error;
-        y->value = s->value;
+        y->error = s->error; //!
+        y->value = s->value; //!
         y->lhs = s->lhs;
         y->rhs = s->rhs;
         y->opcode = s->opcode;
@@ -248,7 +251,7 @@ tms_entry* t_load(void* addr, TempContext& ctx, size_t site_id, size_t linenum) 
         y->linenum = linenum ;
     }
     ctx.smem->on_load(addr, v, fp_op::LOAD, linenum);
-    y->site_id = site_id;
+    y->static_id = site_id;
     ctx.lwm[site_id] = {y, y->timestamp};
     return y;
 }

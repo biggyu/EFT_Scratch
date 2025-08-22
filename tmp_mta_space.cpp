@@ -219,7 +219,7 @@ tms_entry* t_div(tms_entry* a, tms_entry* b, TempContext& ctx, size_t site_id, s
 void t_store(void* addr, tms_entry* y, TempContext& ctx, size_t site_id, size_t linenum) {
     *reinterpret_cast<float*>(addr) = static_cast<float>(y->value); //TODO: use Template for generalization
 
-    smem_entry& m = ctx.smem->on_store(addr, y->value, fp_op::STORE, linenum, nullptr, nullptr)
+    smem_entry& m = ctx.smem->on_store(addr, y->value, fp_op::STORE, linenum, nullptr, nullptr);
     m.error = y_addr->error;
     m.lhs = y_addr->lhs;
     m.rhs = y_addr->rhs;
@@ -247,7 +247,7 @@ tms_entry* t_load(void* addr, TempContext& ctx, size_t site_id, size_t linenum) 
         y->opcode = fp_op::LOAD;
         y->linenum = linenum ;
     }
-    ctx.smem->onload(addr, v, fp_op::LOAD, linenum);
+    ctx.smem->on_load(addr, v, fp_op::LOAD, linenum);
     y->site_id = site_id;
     ctx.lwm[site_id] = {y, y->timestamp};
     return y;

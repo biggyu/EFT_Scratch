@@ -18,7 +18,10 @@ smem_entry& ShadowMemory::on_store(void* addr, double value, fp_op op = fp_op::S
 
 smem_entry& ShadowMemory::on_load(void* addr, double program_value, fp_op op = fp_op::LOAD, size_t linenum = 0) {
     auto it = table.find(reinterpret_cast<uintptr_t>(addr));
-    if (it != table.end() && it->second.value == program_value) {
+    if (it != table.end()) {
+        it->second.value = program_value;
+        it->second.opcode = op;
+        it->second.linenum = linenum;
         return it->second;
     } else {
         auto& e = table[reinterpret_cast<uintptr_t>(addr)];
@@ -27,10 +30,15 @@ smem_entry& ShadowMemory::on_load(void* addr, double program_value, fp_op op = f
         // e.timestamp = ++gloabl_ts_;
         e.opcode = op;
         e.linenum = linenum;
-        // e.lhs = nullptr;
-        // e.rhs = nullptr;
+        e.lhs = nullptr;
+        e.rhs = nullptr;
         return e;
     }
+}
+
+smem_entry& ShadowMemory::peek(void* addr) {
+    auto it = table.find(reinterpret_cast<uintptr_t>(addr));
+    return (it == table.end()) ? nullptr : &it->second;
 }
 
 void ShadowMemory::dump_summary() const {
@@ -44,7 +52,7 @@ void ShadowMemory::dump_summary() const {
 
 // ShadowMemory::ShadowMemory() {
 //     ShadowMemory::gloabl_ts_ = 0;
-// }
+// } 
 
 // smem_entry& ShadowMemory::on_store(void* addr, double value, fp_op op = fp_op::STORE, size_t linenum = 0, smem_entry* lhs = nullptr, smem_entry* rhs = nullptr) {
 //     auto& e = table[reinterpret_cast<uintptr_t>(addr)];

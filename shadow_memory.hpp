@@ -27,6 +27,7 @@ class ShadowMemory {
         smem_entry& on_store(void* addr, double value, fp_op op, size_t linenum, smem_entry* lhs, smem_entry* rhs);
         // smem_entry& on_store(void* addr, double value, fp_op op, size_t linenum);
         smem_entry& on_load(void* addr, double program_value, fp_op op, size_t linenum);
+        smem_entry& peek(void* addr);
         void dump_summary() const;
         
     private:

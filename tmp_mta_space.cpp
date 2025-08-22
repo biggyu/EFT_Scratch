@@ -51,19 +51,23 @@ void TmpMtaSpc::alloc() {
     t->timestamp = ++global_ts;
     return t;
 }
-size_t TmpMtaSpc::inc_ts() {
+void TmpMtaSpc::inc_ts() {
     global_ts++;
 }
 
-size_t inst_id_hash() {
-    string key = string(__FILE__) + ":" + to_string(__LINE__) + ":" + __func__;
+void TmpMtaSpc::get_ts() {
+    return global_ts;
+}
+
+size_t inst_id_hash(const char* file, int line, const char* func) {
+    string key = string(file) + ":" + to_string(line) + ":" + func;
     return std::hash<std::string>{}(key);
 }
 
-tms_entry* t_const(double v, TempContext& ctx, size_t site_id, size_t linenum) {
+tms_entry* t_const(double program_value, TempContext& ctx, size_t site_id, size_t linenum) {
     tms_entry* t = ctx.queue.alloc();
     t->error = 0.0;
-    t->value = v;
+    t->value = program_value;
     t->lhs = nullptr;
     t->rhs = nullptr;
     t->opcode = fp_op::INIT;
@@ -212,34 +216,38 @@ tms_entry* t_div(tms_entry* a, tms_entry* b, TempContext& ctx, size_t site_id, s
     return z;
 }
 
-void t_store(void* addr, double program_value, TempContext& ctx, size_t site_id, size_t linenum) {
-    tms_entry* y_addr = ctx.lwm[site_id].addr;
-    size_t y_ts = ctx.lwm[site_id].ts;
+void t_store(void* addr, tms_entry* y, TempContext& ctx, size_t site_id, size_t linenum) {
+    *reinterpret_cast<float*>(addr) = static_cast<float>(y->value); //TODO: use Template for generalization
 
-    smem_entry& m = ctx.smem->on_store(addr, program_value, fp_op::STORE, linenum)
-    //TODO: For tracing, smem needs lhs, rhs
+    smem_entry& m = ctx.smem->on_store(addr, y->value, fp_op::STORE, linenum, nullptr, nullptr)
+    m.error = y_addr->error;
     m.lhs = y_addr->lhs;
     m.rhs = y_addr->rhs;
-    m.error = y_addr->error;
     ctx.queue.inc_ts();
 }
 
-tms_entry* t_load(void* addr, double program_value, TempContext& ctx, size_t site_id, size_t linenum) {
+tms_entry* t_load(void* addr, TempContext& ctx, size_t site_id, size_t linenum) {
+    double v = static_cast<double>(*reinterpret_cast<float*>(addr)); //TODO: use Template for generalization
+    smem_entry* s = ctx->smem->peek(addr);
+
     tms_entry* y = ctx.queue.alloc();
-    smem_entry& m = ctx.smem->on_load(addr, program_value, fp_op::LOAD, linenum);
-    if(m.value == program_value) {
-        y->error = e.error;
-        y->value = e.value;
-        y->lhs = e.lhs;
-        y->rhs = e.rhs;
+    // smem_entry& m = ctx.smem->on_load(addr, program_value, fp_op::LOAD, linenum);
+    if(s->value == v) {
+        y->error = s->error;
+        y->value = s->value;
+        y->lhs = s->lhs;
+        y->rhs = s->rhs;
+        y->opcode = s->opcode;
+        y->linenum = s->linenum;
     } else {
         y->error = 0;
-        y->value = program_value;
+        y->value = v;
         y->lhs = nullptr;
         y->rhs = nullptr;
+        y->opcode = fp_op::LOAD;
+        y->linenum = linenum ;
     }
-    y->opcode = e.opcode;
-    y->linenum = e.linenum;
+    ctx.smem->onload(addr, v, fp_op::LOAD, linenum);
     y->site_id = site_id;
     ctx.lwm[site_id] = {y, y->timestamp};
     return y;

@@ -43,6 +43,7 @@ class TmpMtaSpc {
         ~TmpMtaSpc();
         void alloc();
         void inc_ts();
+        size_t get_ts();
     private:
         size_t cap;
         TmpMtaSpc* circ_queue;
@@ -58,8 +59,8 @@ struct lwrm_value {
 
 using LstWrtMap = map<size_t, lwrm_value>;
 
-size_t inst_id_hash();
-#define SITE_ID() site_id()
+size_t inst_id_hash(const char* file, int line, const char* func);
+#define SITE_ID() site_id(__FILE__, __LINE__, __func__)
 
 struct TempContext {
     ShadowMemory* smem;
@@ -70,13 +71,13 @@ struct TempContext {
 };
 
 
-tms_entry* t_const(double v, TempContext& ctx, size_t site_id, size_t linenum);
+tms_entry* t_const(double program_value, TempContext& ctx, size_t site_id, size_t linenum);
 tms_entry* t_add(tms_entry* x, tms_entry* y, TempContext& ctx, size_t site_id, size_t linenum);
 tms_entry* t_sub(tms_entry* x, tms_entry* y, TempContext& ctx, size_t site_id, size_t linenum);
 tms_entry* t_mul(tms_entry* x, tms_entry* y, TempContext& ctx, size_t site_id, size_t linenum);
 tms_entry* t_div(tms_entry* x, tms_entry* y, TempContext& ctx, size_t site_id, size_t linenum);
-void t_store(void* addr, double program_value, TempContext& ctx, size_t site_id, size_t linenum);
-tms_entry* t_load(void* addr, double program_value, TempContext& ctx, size_t site_id, size_t linenum);
+void t_store(void* addr, tms_entry* y, TempContext& ctx, size_t site_id, size_t linenum);
+tms_entry* t_load(void* addr, TempContext& ctx, size_t site_id, size_t linenum);
 
 // bool valid_operand(tms_entry* e, const LastWriteInfo& lwi) {
 //     return e && (e->timestamp == lwi.ts);

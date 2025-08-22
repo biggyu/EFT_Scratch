@@ -36,7 +36,7 @@ smem_entry& ShadowMemory::on_load(void* addr, double program_value, fp_op op = f
     }
 }
 
-smem_entry& ShadowMemory::peek(void* addr) {
+const smem_entry* ShadowMemory::peek(void* addr) const {
     auto it = table.find(reinterpret_cast<uintptr_t>(addr));
     return (it == table.end()) ? nullptr : &it->second;
 }

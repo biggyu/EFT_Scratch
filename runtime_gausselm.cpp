@@ -11,8 +11,8 @@ TempContext tmpctx(smem, 256);
 
 template<typename T>
 void SMemStore(T* ptr, ShadowMemory* smem, size_t linenum) {
-    // smem->on_store((void*)ptr, *(ptr), fp_op::STORE, __LINE__, nullptr, nullptr);
-    smem->on_store((void*)ptr, *(ptr), fp_op::STORE, linenum);
+    smem->on_store((void*)ptr, *(ptr), fp_op::STORE, __LINE__, nullptr, nullptr);
+    // smem->on_store((void*)ptr, *(ptr), fp_op::STORE, linenum);
 }
 
 template <typename T>
@@ -58,11 +58,13 @@ int main() {
         for(int j = 0; j < dim; j++) {
             // // SMEM_STORE(&A[i][j]);
             // SMemStore(&A[i][j], smem, __LINE__);
-            t_store(&A[i][j], t_const(A[i][j], tmpctx, SITE_ID(), __LINE__), tmpctx, SITE_ID(), __LINE__);
+            t_store(&A[i][j], t_const(&A[i][j], tmpctx, SITE_ID(), __LINE__), tmpctx, SITE_ID(), __LINE__);
+            // t_store(&A[i][j], t_const(A[i][j], tmpctx, SITE_ID(), __LINE__), tmpctx, SITE_ID(), __LINE__);
         }
         // // SMEM_STORE(&x[i]);
         // SMemStore(&x[i], smem, __LINE__);
-        t_store(&x[i], t_const(x[i], tmpctx, SITE_ID(), __LINE__), tmpctx, SITE_ID(), __LINE__);
+        t_store(&x[i], t_const(&x[i], tmpctx, SITE_ID(), __LINE__), tmpctx, SITE_ID(), __LINE__);
+        // t_store(&x[i], t_const(x[i], tmpctx, SITE_ID(), __LINE__), tmpctx, SITE_ID(), __LINE__);
     }
     for(int i = 0; i < dim; i++) {
         for(int j = 0; j < dim; j++) {
@@ -82,9 +84,9 @@ int main() {
             // float Aii = SMemLoad(&A[i][i], smem, __LINE__);
             // float ratio = Aji / Aii;
             float ratio = A[j][i] / A[i][i];
-            tms_entry* tAji = t_load(&A[j][i], tmpctx, SITE_ID(), __LINE__);
-            tms_entry* tAii = t_load(&A[i][i], tmpctx, SITE_ID(), __LINE__);
-            tms_entry* tratio = t_div(tAji, tAii, tmpctx, SITE_ID(), __LINE__);
+            fp_entry* tAji = t_load(&A[j][i], tmpctx, SITE_ID(), __LINE__);
+            fp_entry* tAii = t_load(&A[i][i], tmpctx, SITE_ID(), __LINE__);
+            fp_entry* tratio = t_div(tAji, tAii, tmpctx, SITE_ID(), __LINE__);
 
             for(int k = 0; k < dim; k++) {
                 // // float Ajk, Aik;
@@ -96,10 +98,10 @@ int main() {
                 // // SMEM_STORE(&A[j][k]);
                 // SMemStore(&A[j][k], smem, __LINE__);
                 A[j][k] = A[j][k] - ratio * A[i][k];
-                tms_entry* tAjk = t_load(&A[j][k], tmpctx, SITE_ID(), __LINE__);
-                tms_entry* tAik = t_load(&A[i][k], tmpctx, SITE_ID(), __LINE__);
-                tms_entry* tprod = t_mul(tratio, tAik, tmpctx, SITE_ID(), __LINE__);
-                tms_entry* tsub = t_sub(tAjk, tprod, tmpctx, SITE_ID(), __LINE__);
+                fp_entry* tAjk = t_load(&A[j][k], tmpctx, SITE_ID(), __LINE__);
+                fp_entry* tAik = t_load(&A[i][k], tmpctx, SITE_ID(), __LINE__);
+                fp_entry* tprod = t_mul(tratio, tAik, tmpctx, SITE_ID(), __LINE__);
+                fp_entry* tsub = t_sub(tAjk, tprod, tmpctx, SITE_ID(), __LINE__);
                 t_store(&A[j][k], tsub, tmpctx, SITE_ID(), __LINE__);
             }
             // // float xj, xi;
@@ -111,10 +113,10 @@ int main() {
             // // SMEM_STORE(&x[j]);
             // SMemStore(&x[j], smem, __LINE__);
             x[j] = x[j] - ratio * x[i];
-            tms_entry* txj = t_load(&x[j], tmpctx, SITE_ID(), __LINE__);
-            tms_entry* txi = t_load(&x[i], tmpctx, SITE_ID(), __LINE__);
-            tms_entry* tprod = t_mul(tratio, txi, tmpctx, SITE_ID(), __LINE__);
-            tms_entry* tsub = t_sub(txj, tprod, tmpctx, SITE_ID(), __LINE__);
+            fp_entry* txj = t_load(&x[j], tmpctx, SITE_ID(), __LINE__);
+            fp_entry* txi = t_load(&x[i], tmpctx, SITE_ID(), __LINE__);
+            fp_entry* tprod = t_mul(tratio, txi, tmpctx, SITE_ID(), __LINE__);
+            fp_entry* tsub = t_sub(txj, tprod, tmpctx, SITE_ID(), __LINE__);
             t_store(&x[j], tsub, tmpctx, SITE_ID(), __LINE__);
         }
     }
@@ -129,9 +131,9 @@ int main() {
             // float Aii = SMemLoad(&A[i - 1][i - 1], smem, __LINE__);
             // float ratio = Aji / Aii;
             float ratio = A[j - 1][i - 1] / A[i - 1][i - 1];
-            tms_entry* tAji = t_load(&A[j - 1][i - 1], tmpctx, SITE_ID(), __LINE__);
-            tms_entry* tAii = t_load(&A[i - 1][i - 1], tmpctx, SITE_ID(), __LINE__);
-            tms_entry* tratio = t_div(tAji, tAii, tmpctx, SITE_ID(), __LINE__);
+            fp_entry* tAji = t_load(&A[j - 1][i - 1], tmpctx, SITE_ID(), __LINE__);
+            fp_entry* tAii = t_load(&A[i - 1][i - 1], tmpctx, SITE_ID(), __LINE__);
+            fp_entry* tratio = t_div(tAji, tAii, tmpctx, SITE_ID(), __LINE__);
 
             for(int k = 0; k < dim; k++) {
                 // // float Ajk, Aik;
@@ -143,10 +145,10 @@ int main() {
                 // // SMEM_STORE(&A[j - 1][k]);
                 // SMemStore(&A[j - 1][k], smem, __LINE__);
                 A[j - 1][k] = A[j - 1][k] - ratio * A[i - 1][k];
-                tms_entry* tAjk = t_load(&A[j - 1][k], tmpctx, SITE_ID(), __LINE__);
-                tms_entry* tAik = t_load(&A[i - 1][k], tmpctx, SITE_ID(), __LINE__);
-                tms_entry* tprod = t_mul(tratio, tAik, tmpctx, SITE_ID(), __LINE__);
-                tms_entry* tresult = t_sub(tAjk, tprod, tmpctx, SITE_ID(), __LINE__);
+                fp_entry* tAjk = t_load(&A[j - 1][k], tmpctx, SITE_ID(), __LINE__);
+                fp_entry* tAik = t_load(&A[i - 1][k], tmpctx, SITE_ID(), __LINE__);
+                fp_entry* tprod = t_mul(tratio, tAik, tmpctx, SITE_ID(), __LINE__);
+                fp_entry* tresult = t_sub(tAjk, tprod, tmpctx, SITE_ID(), __LINE__);
                 t_store(&A[j - 1][k], tresult, tmpctx, SITE_ID(), __LINE__);
             }
             // // float xj, xi;
@@ -158,10 +160,10 @@ int main() {
             // // SMEM_STORE(&x[j - 1]);
             // SMemStore(&x[j - 1], smem, __LINE__);
             x[j - 1] = x[j - 1] - ratio * x[i - 1];
-            tms_entry* txj = t_load(&x[j - 1], tmpctx, SITE_ID(), __LINE__);
-            tms_entry* txi = t_load(&x[i - 1], tmpctx, SITE_ID(), __LINE__);
-            tms_entry* tprod = t_mul(tratio, txi, tmpctx, SITE_ID(), __LINE__);
-            tms_entry* tresult = t_sub(txj, tprod, tmpctx, SITE_ID(), __LINE__);
+            fp_entry* txj = t_load(&x[j - 1], tmpctx, SITE_ID(), __LINE__);
+            fp_entry* txi = t_load(&x[i - 1], tmpctx, SITE_ID(), __LINE__);
+            fp_entry* tprod = t_mul(tratio, txi, tmpctx, SITE_ID(), __LINE__);
+            fp_entry* tresult = t_sub(txj, tprod, tmpctx, SITE_ID(), __LINE__);
             t_store(&x[j - 1], tresult, tmpctx, SITE_ID(), __LINE__);
         }
     }
@@ -177,13 +179,14 @@ int main() {
         // // SMEM_STORE(&A[i][i]);
         // SMemStore(&A[i][i], smem, __LINE__);
         x[i] = x[i] / A[i][i];
-        tms_entry* txi = t_load(&x[i], tmpctx, SITE_ID(), __LINE__);
-        tms_entry* tAii = t_load(&A[i][i], tmpctx, SITE_ID(), __LINE__);
-        tms_entry* tdiv = t_div(txi, tAii, tmpctx, SITE_ID(), __LINE__);
+        fp_entry* txi = t_load(&x[i], tmpctx, SITE_ID(), __LINE__);
+        fp_entry* tAii = t_load(&A[i][i], tmpctx, SITE_ID(), __LINE__);
+        fp_entry* tdiv = t_div(txi, tAii, tmpctx, SITE_ID(), __LINE__);
         t_store(&x[i], tdiv, tmpctx, SITE_ID(), __LINE__);
 
-        A[i][i] = 1.0f;
-        t_store(&A[i][i], t_const(1.0, tmpctx, SITE_ID(), __LINE__), tmpctx, SITE_ID(), __LINE__);
+        A[i][i] = 1.0;
+        t_store(&A[i][i], t_const(&A[i][i], tmpctx, SITE_ID(), __LINE__), tmpctx, SITE_ID(), __LINE__);
+        // t_store(&A[i][i], t_const(A[i][i], tmpctx, SITE_ID(), __LINE__), tmpctx, SITE_ID(), __LINE__);
     }
 
     for(int i = 0; i < dim; i++) {

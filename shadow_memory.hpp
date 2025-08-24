@@ -10,28 +10,30 @@ using namespace std;
 
 enum class fp_op : uint32_t { INIT, LOAD, STORE, ADD, SUB, MUL, DIV, UNKNOWN };
 
-struct smem_entry {
+struct fp_entry {
     double error;
     double value;
-    // size_t timestamp;
     fp_op opcode;
     size_t linenum;
-    smem_entry* lhs;
-    smem_entry* rhs;
+    fp_entry* lhs;
+    fp_entry* rhs;
+    size_t timestamp;
+    size_t static_id;
 };
 
 
 class ShadowMemory {
     public:
-        // ShadowMemory();
-        smem_entry& on_store(void* addr, double value, fp_op op, size_t linenum, smem_entry* lhs, smem_entry* rhs);
-        // smem_entry& on_store(void* addr, double value, fp_op op, size_t linenum);
-        smem_entry& on_load(void* addr, double program_value, fp_op op, size_t linenum);
-        const smem_entry* peek(void* addr) const;
+        ShadowMemory();
+        fp_entry& on_store(void* addr, double value, fp_op op, size_t linenum, fp_entry* lhs, fp_entry* rhs);
+        // fp_entry& on_store(void* addr, double value, fp_op op, size_t linenum);
+        fp_entry& on_load(void* addr, double program_value, fp_op op, size_t linenum);
+        fp_entry* peek(void* addr);
         void dump_summary() const;
+        void inc_ts();
         
     private:
-        map<uintptr_t, smem_entry> table;
-        // size_t gloabl_ts_ = 0;
+        map<uintptr_t, fp_entry> table;
+        size_t gloabl_ts_ = 0;
 };  
 #endif

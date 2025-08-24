@@ -1,14 +1,14 @@
 #include "shadow_memory.hpp"
 
-// ShadowMemory::ShadowMemory() {
-//     ShadowMemory::gloabl_ts_ = 0;
-// }
+ShadowMemory::ShadowMemory() {
+    ShadowMemory::gloabl_ts_ = 0;
+}
 
-smem_entry& ShadowMemory::on_store(void* addr, double value, fp_op op = fp_op::STORE, size_t linenum = 0, smem_entry* lhs = nullptr, smem_entry* rhs = nullptr) {
+fp_entry& ShadowMemory::on_store(void* addr, double value, fp_op op = fp_op::STORE, size_t linenum = 0, fp_entry* lhs = nullptr, fp_entry* rhs = nullptr) {
     auto& e = table[reinterpret_cast<uintptr_t>(addr)];
     e.value = value;
     e.error = 0.0;
-    // e.timestamp = ++gloabl_ts_;
+    e.timestamp = ++gloabl_ts_;
     e.opcode = op;
     e.linenum = linenum;
     e.lhs = lhs;
@@ -16,7 +16,7 @@ smem_entry& ShadowMemory::on_store(void* addr, double value, fp_op op = fp_op::S
     return e;
 }
 
-smem_entry& ShadowMemory::on_load(void* addr, double program_value, fp_op op = fp_op::LOAD, size_t linenum = 0) {
+fp_entry& ShadowMemory::on_load(void* addr, double program_value, fp_op op = fp_op::LOAD, size_t linenum = 0) {
     auto it = table.find(reinterpret_cast<uintptr_t>(addr));
     if (it != table.end()) {
         it->second.value = program_value;
@@ -27,7 +27,7 @@ smem_entry& ShadowMemory::on_load(void* addr, double program_value, fp_op op = f
         auto& e = table[reinterpret_cast<uintptr_t>(addr)];
         e.value = program_value;
         e.error = 0.0;
-        // e.timestamp = ++gloabl_ts_;
+        e.timestamp = ++gloabl_ts_;
         e.opcode = op;
         e.linenum = linenum;
         e.lhs = nullptr;
@@ -36,7 +36,7 @@ smem_entry& ShadowMemory::on_load(void* addr, double program_value, fp_op op = f
     }
 }
 
-const smem_entry* ShadowMemory::peek(void* addr) const {
+fp_entry* ShadowMemory::peek(void* addr) {
     auto it = table.find(reinterpret_cast<uintptr_t>(addr));
     return (it == table.end()) ? nullptr : &it->second;
 }
@@ -48,6 +48,10 @@ void ShadowMemory::dump_summary() const {
         const auto& e = kv.second;
         cout << "  addr=0x" << setw(15) << kv.first << " value=" << setw(17) << setprecision(10) << e.value << " err=" << e.error << "\tln=" << e.linenum << endl;
     }
+}
+
+void ShadowMemory::inc_ts() {
+    gloabl_ts_++;
 }
 
 // ShadowMemory::ShadowMemory() {

@@ -24,16 +24,16 @@ struct fp_entry {
 
 class ShadowMemory {
     public:
-        ShadowMemory();
-        fp_entry& on_store(void* addr, double value, fp_op op, size_t linenum, fp_entry* lhs, fp_entry* rhs);
-        // fp_entry& on_store(void* addr, double value, fp_op op, size_t linenum);
-        fp_entry& on_load(void* addr, double program_value, fp_op op, size_t linenum);
+        // ShadowMemory();
+        fp_entry& on_store(void* dest, fp_entry* org);
+        // fp_entry& on_store(void* addr, double value, size_t linenum);
+        fp_entry& on_load(void* addr, double program_value, size_t linenum);
         fp_entry* peek(void* addr);
         void dump_summary() const;
-        void inc_ts();
+        // void inc_ts();
         
     private:
         map<uintptr_t, fp_entry> table;
-        size_t gloabl_ts_ = 0;
+        // size_t gloabl_ts_ = 0;
 };  
 #endif

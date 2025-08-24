@@ -58,13 +58,14 @@ int main() {
         for(int j = 0; j < dim; j++) {
             // // SMEM_STORE(&A[i][j]);
             // SMemStore(&A[i][j], smem, __LINE__);
-            t_store(&A[i][j], t_const(&A[i][j], tmpctx, SITE_ID(), __LINE__), tmpctx, SITE_ID(), __LINE__);
+            // t_store(&A[i][j], t_const(&A[i][j], tmpctx, SITE_ID(), __LINE__), tmpctx, SITE_ID(), __LINE__);
+            t_store(&A[i][j], t_const(A[i][j], tmpctx, SITE_ID(), __LINE__), tmpctx, SITE_ID(), __LINE__);
             // t_store(&A[i][j], t_const(A[i][j], tmpctx, SITE_ID(), __LINE__), tmpctx, SITE_ID(), __LINE__);
         }
         // // SMEM_STORE(&x[i]);
         // SMemStore(&x[i], smem, __LINE__);
-        t_store(&x[i], t_const(&x[i], tmpctx, SITE_ID(), __LINE__), tmpctx, SITE_ID(), __LINE__);
-        // t_store(&x[i], t_const(x[i], tmpctx, SITE_ID(), __LINE__), tmpctx, SITE_ID(), __LINE__);
+        // t_store(&x[i], t_const(&x[i], tmpctx, SITE_ID(), __LINE__), tmpctx, SITE_ID(), __LINE__);
+        t_store(&x[i], t_const(x[i], tmpctx, SITE_ID(), __LINE__), tmpctx, SITE_ID(), __LINE__);
     }
     for(int i = 0; i < dim; i++) {
         for(int j = 0; j < dim; j++) {
@@ -185,8 +186,8 @@ int main() {
         t_store(&x[i], tdiv, tmpctx, SITE_ID(), __LINE__);
 
         A[i][i] = 1.0;
-        t_store(&A[i][i], t_const(&A[i][i], tmpctx, SITE_ID(), __LINE__), tmpctx, SITE_ID(), __LINE__);
-        // t_store(&A[i][i], t_const(A[i][i], tmpctx, SITE_ID(), __LINE__), tmpctx, SITE_ID(), __LINE__);
+        //t_store(&A[i][i], t_const(&A[i][i], tmpctx, SITE_ID(), __LINE__), tmpctx, SITE_ID(), __LINE__);
+        t_store(&A[i][i], t_const(A[i][i], tmpctx, SITE_ID(), __LINE__), tmpctx, SITE_ID(), __LINE__);
     }
 
     for(int i = 0; i < dim; i++) {

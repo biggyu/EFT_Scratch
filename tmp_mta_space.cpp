@@ -66,14 +66,13 @@ size_t inst_id_hash(const char* file, int line, const char* func) {
     return std::hash<std::string>{}(key);
 }
 
-// template<typename T>
-// fp_entry* t_const(T program_value, TempContext& ctx, size_t site_id, size_t linenum) {
-// fp_entry* t_const(float program_value, TempContext& ctx, size_t site_id, size_t linenum) {
-fp_entry* t_const(float* program_value, TempContext& ctx, size_t site_id, size_t linenum) {
+// template<typename F>
+// fp_entry* t_const(F& program_value, TempContext& ctx, size_t site_id, size_t linenum) {
+fp_entry* t_const(float& program_value, TempContext& ctx, size_t site_id, size_t linenum) {
     fp_entry* t = ctx.queue.alloc();
     t->error = 0.0;
-    t->value = static_cast<double>(*(program_value));
-    // t->value = static_cast<double>(program_value);
+    // t->value = static_cast<double>(*(program_value));
+    t->value = static_cast<double>(program_value);
     t->lhs = nullptr;
     t->rhs = nullptr;
     t->opcode = fp_op::INIT;
@@ -229,11 +228,11 @@ fp_entry* t_div(fp_entry* a, fp_entry* b, TempContext& ctx, size_t site_id, size
 
 void t_store(void* addr, fp_entry* y, TempContext& ctx, size_t site_id, size_t linenum) {
     // *reinterpret_cast<float*>(addr) = static_cast<float>(y->value); //TODO: use Template for generalization //?
-    // smem_entry& m = ctx.smem->on_store(addr, y->value, fp_op::STORE, linenum, nullptr, nullptr); //?
 
     fp_entry* y_addr = ctx.lwm[y->static_id].addr;
     size_t y_ts = ctx.lwm[y->static_id].ts;
-    memcpy(ctx.smem->peek(addr), y, sizeof(fp_entry)); //! SIZE
+    fp_entry& m = ctx.smem->on_store(addr, y_addr->value, fp_op::STORE, linenum, nullptr, nullptr);
+    // memcpy(ctx.smem->peek(addr), y, sizeof(fp_entry)); //! SIZE
     // m.error = y->error;
     // m.lhs = y->lhs;
     // m.rhs = y->rhs;
@@ -246,15 +245,15 @@ fp_entry* t_load(void* addr, TempContext& ctx, size_t site_id, size_t linenum) {
     fp_entry* s = ctx.smem->peek(addr);
 
     fp_entry* y = ctx.queue.alloc();
-    // smem_entry& m = ctx.smem->on_load(addr, program_value, fp_op::LOAD, linenum);
+    fp_entry& m = ctx.smem->on_load(addr, v, fp_op::LOAD, linenum);
     if(s->value == v) {
-        memcpy(y, s, sizeof(fp_entry)); //! SIZE
-        // y->value = s->value;
-        // y->error = s->error;
-        // y->lhs = s->lhs;
-        // y->rhs = s->rhs;
-        // y->opcode = s->opcode;
-        // y->linenum = s->linenum;
+        // memcpy(y, s, sizeof(fp_entry)); //! SIZE
+        y->value = s->value;
+        y->error = s->error;
+        y->lhs = s->lhs;
+        y->rhs = s->rhs;
+        y->opcode = s->opcode;
+        y->linenum = s->linenum;
     } else {
         y->error = 0;
         y->value = v;

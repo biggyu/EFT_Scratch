@@ -71,10 +71,9 @@ struct TempContext {
     explicit TempContext(ShadowMemory* s, size_t cap=256) : smem(s), queue(cap) {}
 };
 
-// template <typename T>
-// fp_entry* t_const(T program_value, TempContext& ctx, size_t site_id, size_t linenum);
-// fp_entry* t_const(float program_value, TempContext& ctx, size_t site_id, size_t linenum);
-fp_entry* t_const(float* program_value, TempContext& ctx, size_t site_id, size_t linenum);
+// template <typename F>
+// fp_entry* t_const(F& program_value, TempContext& ctx, size_t site_id, size_t linenum);
+fp_entry* t_const(float& program_value, TempContext& ctx, size_t site_id, size_t linenum);
 fp_entry* t_add(fp_entry* x, fp_entry* y, TempContext& ctx, size_t site_id, size_t linenum);
 fp_entry* t_sub(fp_entry* x, fp_entry* y, TempContext& ctx, size_t site_id, size_t linenum);
 fp_entry* t_mul(fp_entry* x, fp_entry* y, TempContext& ctx, size_t site_id, size_t linenum);

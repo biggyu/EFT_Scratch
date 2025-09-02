@@ -69,7 +69,7 @@ TempContext::TempContext(ShadowMemory* s, size_t cap_=256) : smem(s) {
     circ_queue = new fp_entry[cap_];
     head = 0;
     global_ts = 0;
-
+    tracing.push_back(NULL);
 }
 
 TempContext::~TempContext() {
@@ -109,14 +109,16 @@ fp_entry* TempContext::t_add(fp_entry* a, fp_entry* b, size_t site_id, size_t li
     if(a_lwm.ts == a_lwm.addr->timestamp) {
         z->lhs = a_lwm.addr;
         a_error = a_lwm.addr->error;
-    } else {
+    }
+    else {
         z->lhs = nullptr;
         a_error = 0.0;
     }
     if(b_lwm.ts == b_lwm.addr->timestamp) {
         z->rhs = b_lwm.addr;
         b_error = b_lwm.addr->error;
-    } else {
+    }
+    else {
         z->rhs = nullptr;
         b_error = 0.0;
     }
@@ -139,14 +141,16 @@ fp_entry* TempContext::t_sub(fp_entry* a, fp_entry* b, size_t site_id, size_t li
     if(a_lwm.ts == a_lwm.addr->timestamp) {
         z->lhs = a_lwm.addr;
         a_error = a_lwm.addr->error;
-    } else {
+    }
+    else {
         z->lhs = nullptr;
         a_error = 0.0;
     }
     if(b_lwm.ts == b_lwm.addr->timestamp) {
         z->rhs = b_lwm.addr;
         b_error = b_lwm.addr->error;
-    } else {
+    }
+    else {
         z->rhs = nullptr;
         b_error = 0.0;
     }
@@ -169,14 +173,16 @@ fp_entry* TempContext::t_mul(fp_entry* a, fp_entry* b, size_t site_id, size_t li
     if(a_lwm.ts == a_lwm.addr->timestamp) {
         z->lhs = a_lwm.addr;
         a_error = a_lwm.addr->error;
-    } else {
+    }
+    else {
         z->lhs = nullptr;
         a_error = 0.0;
     }
     if(b_lwm.ts == b_lwm.addr->timestamp) {
         z->rhs = b_lwm.addr;
         b_error = b_lwm.addr->error;
-    } else {
+    }
+    else {
         z->rhs = nullptr;
         b_error = 0.0;
     }
@@ -199,14 +205,16 @@ fp_entry* TempContext::t_div(fp_entry* a, fp_entry* b, size_t site_id, size_t li
     if(a_lwm.ts == a_lwm.addr->timestamp) {
         z->lhs = a_lwm.addr;
         a_error = a_lwm.addr->error;
-    } else {
+    }
+    else {
         z->lhs = nullptr;
         a_error = 0.0;
     }
     if(b_lwm.ts == b_lwm.addr->timestamp) {
         z->rhs = b_lwm.addr;
         b_error = b_lwm.addr->error;
-    } else {
+    }
+    else {
         z->rhs = nullptr;
         b_error = 0.0;
     }
@@ -251,7 +259,8 @@ fp_entry* TempContext::t_load(void* addr, size_t site_id, size_t linenum) {
         y->rhs = s->rhs;
         y->opcode = s->opcode;
         y->linenum = s->linenum;
-    } else {
+    }
+    else {
         y->value = v;
         y->error = 0.0;
         y->lhs = nullptr;

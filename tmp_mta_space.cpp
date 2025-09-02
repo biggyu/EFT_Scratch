@@ -326,12 +326,8 @@ void TempContext::dump_tracing(fp_entry* x) {
     }
     backtrack(x);
     for(int i = 0; i < tracing.size(); i++) {
-        cout << i << " : ";
-        if (tracing.at(i) == NULL) {
-            cout << "NULL" << endl;
-        }
-        else {
-            cout << "err= " << tracing.at(i)->error << " value= " << tracing.at(i)->value << " ts= " << tracing.at(i)->timestamp << " line= " << tracing.at(i)->linenum << endl;
+        if (tracing.at(i) != NULL) {
+            cout << i << " : err= " << tracing.at(i)->error << " value= " << tracing.at(i)->value << " ts= " << tracing.at(i)->timestamp << " line= " << tracing.at(i)->linenum << endl;
         }
     }
 }

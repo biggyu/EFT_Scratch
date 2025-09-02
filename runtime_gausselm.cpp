@@ -22,9 +22,9 @@ TempContext* tmpctx = new TempContext(smem, 256);
 //   return v;
 // }
 
-void SMemDump() {
-    smem->dump_summary();
-}
+// void SMemDump() {
+//     smem->dump_summary();
+// }
 
 int main() {
     // float A00 = 2.0f;
@@ -191,6 +191,7 @@ int main() {
             fp_entry* tprod = tmpctx->t_mul(tratio, txi, SITE_ID(), __LINE__);
             fp_entry* tresult = tmpctx->t_sub(txj, tprod, SITE_ID(), __LINE__);
             tmpctx->t_store(&x[j - 1], tresult, SITE_ID(), __LINE__);
+            tmpctx->dump_tracing(tresult);
         }
     }
     for(int i = 0; i < dim; i++) {

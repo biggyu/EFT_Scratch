@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <cstring>
 #include <map>
+#include <vector>
 #include "shadow_memory.hpp"
 
 using namespace std;
@@ -76,7 +77,9 @@ class TempContext {
         fp_entry* t_div(fp_entry* x, fp_entry* y, size_t site_id, size_t linenum);
         void t_store(void* addr, fp_entry* y, size_t site_id, size_t linenum);
         fp_entry* t_load(void* addr, size_t site_id, size_t linenum);
+        void backtrack(fp_entry* x, int ind);
         void dump_sum();
+        void dump_tracing(fp_entry* x);
     private:
         ShadowMemory* smem;
         size_t global_ts;
@@ -87,6 +90,8 @@ class TempContext {
         size_t head;
 
         map<size_t, lwrm_value> lwm;
+        vector<fp_entry*> tracing;
+
         void TwoSum(double a, double b, double& x, double& dx) {
             x = a + b;
             double bp = x - a;

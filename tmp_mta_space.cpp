@@ -69,7 +69,7 @@ TempContext::TempContext(ShadowMemory* s, size_t cap_=256) : smem(s) {
     circ_queue = new fp_entry[cap_];
     head = 0;
     global_ts = 0;
-    tracing.push_back(NULL);
+    // tracing.push_back(NULL);
 }
 
 TempContext::~TempContext() {
@@ -278,6 +278,62 @@ fp_entry* TempContext::t_load(void* addr, size_t site_id, size_t linenum) {
 
 void TempContext::dump_sum() {
     smem->dump_summary();
+}
+
+void TempContext::backtrack(fp_entry* x, int ind=0) {
+    // cout << x->value << endl;
+    // cout << x->lhs->timestamp << " " << x->timestamp << " " << x->rhs->timestamp << endl;
+    // if(x->lhs == nullptr) {
+    //     cout << "lhs = null ";
+    // }
+    // else {
+    //     cout << x->lhs->timestamp << " ";
+    // }
+    // if(x == nullptr) {
+    //     cout << "x = null ";
+    // }
+    // else {
+    //     cout << x->timestamp << " ";
+    // }
+    // if(x->rhs == nullptr) {
+    //     cout << "rhs = null" << endl;
+    // }
+    // else {
+    //     cout << x->rhs->timestamp << endl;
+    // }
+    // cout << ind << " " << x->error << " " << x->timestamp << " " << tracing.size() << endl;
+    lwrm_value x_lwm = lwm[x->static_id];
+    tracing[ind] = x;
+    if(x->lhs != nullptr) {
+        if(x->timestamp > x->lhs->timestamp) {
+            backtrack(x->lhs, ind * 2 + 1);
+        }
+    }
+    if(x->rhs != nullptr) {
+        if(x->timestamp > x->rhs->timestamp) {
+            backtrack(x->rhs, (ind + 1) * 2);
+        }
+    }
+    return;
+    // else {
+    //     return;
+    // }
+}
+
+void TempContext::dump_tracing(fp_entry* x) {
+    for(int i = 0; i < lwm.size(); i++) {
+        tracing.push_back(nullptr);
+    }
+    backtrack(x);
+    for(int i = 0; i < tracing.size(); i++) {
+        cout << i << " : ";
+        if (tracing.at(i) == NULL) {
+            cout << "NULL" << endl;
+        }
+        else {
+            cout << "err= " << tracing.at(i)->error << " value= " << tracing.at(i)->value << " ts= " << tracing.at(i)->timestamp << " line= " << tracing.at(i)->linenum << endl;
+        }
+    }
 }
 
 // // template<typename F>

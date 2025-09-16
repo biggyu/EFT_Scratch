@@ -281,27 +281,6 @@ void TempContext::dump_sum() {
 }
 
 void TempContext::backtrack(fp_entry* x, int ind=0) {
-    // cout << x->value << endl;
-    // cout << x->lhs->timestamp << " " << x->timestamp << " " << x->rhs->timestamp << endl;
-    // if(x->lhs == nullptr) {
-    //     cout << "lhs = null ";
-    // }
-    // else {
-    //     cout << x->lhs->timestamp << " ";
-    // }
-    // if(x == nullptr) {
-    //     cout << "x = null ";
-    // }
-    // else {
-    //     cout << x->timestamp << " ";
-    // }
-    // if(x->rhs == nullptr) {
-    //     cout << "rhs = null" << endl;
-    // }
-    // else {
-    //     cout << x->rhs->timestamp << endl;
-    // }
-    // cout << ind << " " << x->error << " " << x->timestamp << " " << tracing.size() << endl;
     lwrm_value x_lwm = lwm[x->static_id];
     tracing[ind] = x;
     if(x->lhs != nullptr) {
@@ -315,9 +294,6 @@ void TempContext::backtrack(fp_entry* x, int ind=0) {
         }
     }
     return;
-    // else {
-    //     return;
-    // }
 }
 
 void TempContext::dump_tracing(fp_entry* x) {

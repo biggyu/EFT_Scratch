@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 void main() {
-    int dim = 4;
+    clock_t start_time = clock();
+    int dim = 3;
     // int **A;
     // A = (int **) malloc (sizeof(int*) * dim);
     // // for(int i = 0; i < dim; i++) {
@@ -15,24 +17,24 @@ void main() {
     // }
     // printf("\n");
 
-    // Random Values for A, x
-    float A[dim][dim];
-    float x[dim];
-    srand((unsigned int)time(NULL));
-    for(int i = 0; i < dim; i++) {
-        for(int j = 0; j < dim; j++) {
-            A[i][j] = (rand() / (float)RAND_MAX + rand() % 15) * (rand() % 2 == 1 ? 1 : -1);
-        }
-        x[i] = (rand() / (float)RAND_MAX + rand() % 20) * (rand() % 2 == 1 ? 1 : -1);
-    }
+    // // Random Values for A, x
+    // float A[dim][dim];
+    // float x[dim];
+    // srand((unsigned int)time(NULL));
+    // for(int i = 0; i < dim; i++) {
+    //     for(int j = 0; j < dim; j++) {
+    //         A[i][j] = (rand() / (float)RAND_MAX + rand() % 15) * (rand() % 2 == 1 ? 1 : -1);
+    //     }
+    //     x[i] = (rand() / (float)RAND_MAX + rand() % 20) * (rand() % 2 == 1 ? 1 : -1);
+    // }
 
     // // Initialize Matrix, Vector
-    // float A[3][3] = {
-    //     {-16.1598, 15.7984, 9.3352,},
-    //     {-6.4460, 3.3648, -5.0838,},
-    //     {11.1416, -8.7571, 2.1567,},
-    // };
-    // float x[3] = {-14.8912, -1.4871, -6.7040};
+    float A[3][3] = {
+        {-16.1598, 15.7984, 9.3352,},
+        {-6.4460, 3.3648, -5.0838,},
+        {11.1416, -8.7571, 2.1567,},
+    };
+    float x[3] = {-14.8912, -1.4871, -6.7040};
     for(int i = 0; i < dim; i++) {
         for(int j = 0; j < dim; j++) {
             printf("%f ", A[i][j]);
@@ -77,4 +79,7 @@ void main() {
         printf("\t%f\n", x[i]);
         // printf("\n");
     }
+    clock_t end_time = clock();
+    double exc_time = (double)(end_time - start_time) / CLOCKS_PER_SEC;
+    printf("Execution Time: %fµs\n", exc_time * 1000 * 1000);
 }

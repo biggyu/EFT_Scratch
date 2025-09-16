@@ -1,6 +1,6 @@
 // #include <stdio.h>
 // #include <stdlib.h>
-
+#include <chrono>
 #include "shadow_memory.hpp"
 #include "tmp_mta_space.hpp"
 using namespace std;
@@ -32,7 +32,7 @@ int main() {
     // SMEM_STORE(&A00);
     // SMEM_LOAD(&A00, t);
     // printf("t = %f\n", t); 
-
+    auto start_time = chrono::high_resolution_clock::now();
     int dim = 3;
 
     // // Random Values for A, x
@@ -230,5 +230,7 @@ int main() {
     }
     // SMemDump();
     tmpctx->dump_sum();
+    auto end_time = chrono::high_resolution_clock::now();
+    cout << chrono::duration_cast<chrono::microseconds>(end_time - start_time).count() << "µs" << endl;
     return 0;
 }

@@ -95,7 +95,7 @@ class TempContext {
         void TwoSum(double a, double b, double& x, double& dx) {
             x = a + b;
             double bp = x - a;
-            double ap = a - bp;
+            double ap = x - bp;
             double da = a - ap;
             double db = b - bp;
             dx = da + db;

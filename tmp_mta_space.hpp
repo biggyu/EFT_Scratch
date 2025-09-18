@@ -71,10 +71,10 @@ class TempContext {
         fp_entry* alloc();
         void inc_ts();
         fp_entry* t_const(float& program_value, size_t site_id, size_t linenum);
-        fp_entry* t_add(fp_entry* x, fp_entry* y, size_t site_id, size_t linenum);
-        fp_entry* t_sub(fp_entry* x, fp_entry* y, size_t site_id, size_t linenum);
-        fp_entry* t_mul(fp_entry* x, fp_entry* y, size_t site_id, size_t linenum);
-        fp_entry* t_div(fp_entry* x, fp_entry* y, size_t site_id, size_t linenum);
+        fp_entry* t_add(fp_entry* a, fp_entry* b, size_t site_id, size_t linenum);
+        fp_entry* t_sub(fp_entry* a, fp_entry* b, size_t site_id, size_t linenum);
+        fp_entry* t_mul(fp_entry* a, fp_entry* b, size_t site_id, size_t linenum);
+        fp_entry* t_div(fp_entry* a, fp_entry* b, size_t site_id, size_t linenum);
         void t_store(void* addr, fp_entry* y, size_t site_id, size_t linenum);
         fp_entry* t_load(void* addr, size_t site_id, size_t linenum);
         void backtrack(fp_entry* x, int ind);

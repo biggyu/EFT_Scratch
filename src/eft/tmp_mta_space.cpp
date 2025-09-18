@@ -1,4 +1,4 @@
-#include "tmp_mta_space.hpp"
+#include "eft/tmp_mta_space.hpp"
 
 // void TwoSum(double a, double b, double& x, double& dx) {
 //     x = a + b;
@@ -58,7 +58,7 @@
 // size_t TmpMtaSpc::get_ts() {
 //     return global_ts;
 // }
-
+namespace eft {
 size_t inst_id_hash(const char* file, int line, const char* func) {
     string key = string(file) + ":" + to_string(line) + ":" + func;
     return std::hash<std::string>{}(key);
@@ -69,7 +69,6 @@ TempContext::TempContext(ShadowMemory* s, size_t cap_=256) : smem(s) {
     circ_queue = new fp_entry[cap_];
     head = 0;
     global_ts = 0;
-    // tracing.push_back(NULL);
 }
 
 TempContext::~TempContext() {
@@ -96,7 +95,6 @@ fp_entry* TempContext::t_const(float& program_value, size_t site_id, size_t line
     t->opcode = fp_op::INIT;
     t->linenum = linenum;
     t->static_id = site_id;
-    // inc_ts();
     lwm[site_id] = {t, t->timestamp};
     return t;
 }
@@ -128,7 +126,6 @@ fp_entry* TempContext::t_add(fp_entry* a, fp_entry* b, size_t site_id, size_t li
     z->opcode = fp_op::ADD;
     z->linenum = linenum;
     z->static_id = site_id;
-    // inc_ts();
     lwm[site_id] = {z, z->timestamp};
     return z;
 }
@@ -160,7 +157,6 @@ fp_entry* TempContext::t_sub(fp_entry* a, fp_entry* b, size_t site_id, size_t li
     z->opcode = fp_op::SUB;
     z->linenum = linenum;
     z->static_id = site_id;
-    // inc_ts();
     lwm[site_id] = {z, z->timestamp};
     return z;
 }
@@ -192,7 +188,6 @@ fp_entry* TempContext::t_mul(fp_entry* a, fp_entry* b, size_t site_id, size_t li
     z->opcode = fp_op::MUL;
     z->linenum = linenum;
     z->static_id = site_id;
-    // inc_ts();
     lwm[site_id] = {z, z->timestamp};
     return z;
 }
@@ -224,35 +219,21 @@ fp_entry* TempContext::t_div(fp_entry* a, fp_entry* b, size_t site_id, size_t li
     z->opcode = fp_op::DIV;
     z->linenum = linenum;
     z->static_id = site_id;
-    // inc_ts();
     lwm[site_id] = {z, z->timestamp};
     return z;
 }
 
 void TempContext::t_store(void* addr, fp_entry* y, size_t site_id, size_t linenum) {
-    // *reinterpret_cast<float*>(addr) = static_cast<float>(y->value); //TODO: use Template for generalization //?
-    // fp_entry* y_addr = ctx.lwm[y->static_id].addr;
-    // size_t y_ts = ctx.lwm[y->static_id].ts;
-    // fp_entry& m = ctx.smem->on_store(addr, y_addr->value, fp_op::STORE, linenum, nullptr, nullptr);
     lwrm_value y_lwm = lwm[y->static_id];
     fp_entry& m = smem->on_store(addr, y_lwm.addr);
-    // m.error = y_lwm.addr->error;
-    // m.lhs = y_lwm.addr->lhs;
-    // m.rhs = y_lwm.addr->rhs;
     inc_ts();
 }
 
 fp_entry* TempContext::t_load(void* addr, size_t site_id, size_t linenum) {
     double v = static_cast<double>(*reinterpret_cast<float*>(addr)); //TODO: use Template for generalization
     fp_entry* s = smem->peek(addr);
-    // fp_entry& m = smem->onload(addr, v, linenum);
-
-    // fp_entry* s = ctx.smem->peek(addr);
-    // fp_entry* y = ctx.queue.alloc();
-    // fp_entry& m = ctx.smem->on_load(addr, v, fp_op::LOAD, linenum);
     fp_entry* y = alloc();
     if(s->value == v) {
-        // memcpy(y, s, sizeof(fp_entry)); //! SIZE
         y->value = s->value;
         y->error = s->error;
         y->lhs = s->lhs;
@@ -268,10 +249,7 @@ fp_entry* TempContext::t_load(void* addr, size_t site_id, size_t linenum) {
         y->opcode = fp_op::LOAD;
         y->linenum = linenum;
     }
-    // ctx.smem->on_load(addr, v, fp_op::LOAD, linenum); //?
     y->static_id = site_id;
-    // ctx.queue.inc_ts();
-    // ctx.lwm[site_id] = {y, y->timestamp};
     lwm[site_id] = {y, y->timestamp};
     return y;
 }
@@ -307,7 +285,7 @@ void TempContext::dump_tracing(fp_entry* x) {
         }
     }
 }
-
+}
 // // template<typename F>
 // // fp_entry* t_const(F& program_value, TempContext& ctx, size_t site_id, size_t linenum) {
 // fp_entry* t_const(float& program_value, TempContext& ctx, size_t site_id, size_t linenum) {

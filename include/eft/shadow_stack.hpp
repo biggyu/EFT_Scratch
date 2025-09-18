@@ -2,10 +2,10 @@
 #include <vector>
 #include <cstddef>
 #include <cassert>
-#include "shadow_memory.hpp"
-#include "tmp_mta_space.hpp"
+#include "eft/shadow_memory.hpp"
+#include "eft/tmp_mta_space.hpp"
 using namespace std;
-
+namespace eft {
 struct ShadowFrame {
     vector<fp_entry*> params;
     fp_entry* ret;
@@ -40,3 +40,5 @@ class ShadowStack {
 #define SHADOW_FUNC_ENTER() auto& __shadow_top = ShadowStack::top()
 #define SHADOW_PARAM(I)     (__shadow_top.params.at(I))
 #define SHADOW_RETURN(META_PTR) do { ShadowStack::set_ret((META_PTR)); return (META_PTR)->value; } while(0)
+
+}

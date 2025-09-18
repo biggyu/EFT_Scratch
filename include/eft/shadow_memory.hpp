@@ -9,7 +9,8 @@
 using namespace std;
 
 enum class fp_op : uint32_t { INIT, LOAD, STORE, ADD, SUB, MUL, DIV, UNKNOWN };
-
+namespace eft {
+    
 struct fp_entry {
     double error;
     double value;
@@ -35,5 +36,7 @@ class ShadowMemory {
     private:
         map<uintptr_t, fp_entry> table;
         // size_t gloabl_ts_ = 0;
-};  
+};
+
+}
 #endif

@@ -1,9 +1,9 @@
-#include "shadow_memory.hpp"
+#include "eft/shadow_memory.hpp"
 
 // ShadowMemory::ShadowMemory() {
 //     ShadowMemory::gloabl_ts_ = 0;
 // }
-
+namespace eft {
 fp_entry& ShadowMemory::on_store(void* dest, fp_entry* org) {
     auto& e = table[reinterpret_cast<uintptr_t>(dest)];
     e.value = org->value;
@@ -49,6 +49,8 @@ void ShadowMemory::dump_summary() const {
         cout << "  addr=0x" << setw(15) << kv.first << " value=" << setw(17) << setprecision(10) << e.value << " err=" << e.error << "\tln=" << e.linenum << "\tts=" << e.timestamp << endl;
     }
 }
+}
+
 
 // void ShadowMemory::inc_ts() {
 //     gloabl_ts_++;

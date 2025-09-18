@@ -6,7 +6,7 @@
 #include <cstring>
 #include <map>
 #include <vector>
-#include "shadow_memory.hpp"
+#include "eft/shadow_memory.hpp"
 
 using namespace std;
 // void TwoSum(double a, double b, double& x, double &dx);
@@ -54,12 +54,13 @@ using namespace std;
 
 // };
 
+
+// using LstWrtMap = map<size_t, lwrm_value>;
+namespace eft {
 struct lwrm_value {
     fp_entry* addr;
     size_t ts;
 };
-
-// using LstWrtMap = map<size_t, lwrm_value>;
 
 size_t inst_id_hash(const char* file, int line, const char* func);
 #define SITE_ID() inst_id_hash(__FILE__, __LINE__, __func__)
@@ -126,6 +127,9 @@ class TempContext {
             dx = (da - dx - x * db) / (b + db);
         }
 };
+
+}
+
 
 // // template <typename F>
 // // fp_entry* t_const(F& program_value, TempContext& ctx, size_t site_id, size_t linenum);

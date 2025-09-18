@@ -1,10 +1,11 @@
 // #include <stdio.h>
 // #include <stdlib.h>
 #include <chrono>
-#include "shadow_memory.hpp"
-#include "tmp_mta_space.hpp"
+#include <eft/eft.hpp>
+// #include "shadow_memory.hpp"
+// #include "tmp_mta_space.hpp"
 using namespace std;
-
+using namespace eft;
 // ShadowMemory smem;
 ShadowMemory* smem = new ShadowMemory();
 TempContext* tmpctx = new TempContext(smem, 256);

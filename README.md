@@ -1,20 +1,31 @@
 # EFT_Scratch
 
 ## Build & Run
-Compile the source code to run EFT_Scratch. "shadow_memory.cpp" and "tmp_mta_space.cpp" are code to run EFT_Scratch and "runtime_gausselm.cpp" is a modified code that compiler passes are added.
+Run cmake to build the library and runtime code. The execution file will be made under build/.
 ```bash
-g++ runtime_gausselm.cpp shadow_memory.cpp tmp_mta_space.cpp -o rt.exe
-
-./rt
+cmake -S . -B build -DEFT_BUILD_TESTS=ON
+cmake --build build -j
+./build/gausselm_eft
 ```
 
 ## Repository Structure
 
 ```
 .
-├── runtime_gausselm.cpp      # Demo: Gauss–Jordan elimination instrumented end‑to‑end
-├── shadow_memory.hpp/.cpp    # Shadow memory map, unified fp_entry
-└── tmp_mta_space.hpp/.cpp    # Temporary metadata space, EFT ops, last‑writer map
+├── include/
+│   └── eft/
+│       ├── eft.hpp
+│       ├── shadow_memory.hpp
+│       ├── tmp_mta_space.hpp
+│       └── shadow_stack.hpp # implementing
+├── src/
+│   └── eft/
+│       ├── shadow_memory.cpp
+│       ├── tmp_mta_space.cpp
+│       └── shadow_stack.cpp # implementing
+└── tests/
+    ├── gausselm_.c
+    └── gausselm_eft.cpp
 ```
 
 ## `fp_entry`

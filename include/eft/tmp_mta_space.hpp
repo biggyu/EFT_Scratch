@@ -71,7 +71,19 @@ class TempContext {
         ~TempContext();
         fp_entry* alloc();
         void inc_ts();
-        fp_entry* t_const(float& program_value, size_t site_id, size_t linenum);
+        template <typename T>
+        fp_entry* t_const(T program_value, size_t site_id, size_t linenum) {
+            fp_entry* t = alloc();
+            t->error = 0.0;
+            t->value = static_cast<double>(program_value);
+            t->lhs = nullptr;
+            t->rhs = nullptr;
+            t->opcode = fp_op::INIT;
+            t->linenum = linenum;
+            t->static_id = site_id;
+            lwm[site_id] = {t, t->timestamp};
+            return t;
+        }
         fp_entry* t_add(fp_entry* a, fp_entry* b, size_t site_id, size_t linenum);
         fp_entry* t_sub(fp_entry* a, fp_entry* b, size_t site_id, size_t linenum);
         fp_entry* t_mul(fp_entry* a, fp_entry* b, size_t site_id, size_t linenum);
@@ -120,6 +132,11 @@ class TempContext {
         void TwoDiv(double a, double b, double& x, double& dx) {
             x = a / b;
             dx = std::fma(x, b, -a);
+        }
+
+        void SquareRoot(double a, double& x, double& dx) {
+            x = sqrt(a);
+            dx = std::fma(-x, x, a);
         }
 
         void PropDivError(double a, double da, double b, double db, double& x, double& dx) {

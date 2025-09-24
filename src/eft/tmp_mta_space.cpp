@@ -86,18 +86,18 @@ void TempContext::inc_ts() {
     global_ts++;
 }
 
-fp_entry* TempContext::t_const(float& program_value, size_t site_id, size_t linenum) {
-    fp_entry* t = alloc();
-    t->error = 0.0;
-    t->value = static_cast<double>(program_value);
-    t->lhs = nullptr;
-    t->rhs = nullptr;
-    t->opcode = fp_op::INIT;
-    t->linenum = linenum;
-    t->static_id = site_id;
-    lwm[site_id] = {t, t->timestamp};
-    return t;
-}
+// fp_entry* TempContext::t_const(float& program_value, size_t site_id, size_t linenum) {
+//     fp_entry* t = alloc();
+//     t->error = 0.0;
+//     t->value = static_cast<double>(program_value);
+//     t->lhs = nullptr;
+//     t->rhs = nullptr;
+//     t->opcode = fp_op::INIT;
+//     t->linenum = linenum;
+//     t->static_id = site_id;
+//     lwm[site_id] = {t, t->timestamp};
+//     return t;
+// }
 
 fp_entry* TempContext::t_add(fp_entry* a, fp_entry* b, size_t site_id, size_t linenum) {
     fp_entry* z = alloc();

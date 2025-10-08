@@ -88,6 +88,7 @@ class TempContext {
         fp_entry* t_sub(fp_entry* a, fp_entry* b, size_t site_id, size_t linenum);
         fp_entry* t_mul(fp_entry* a, fp_entry* b, size_t site_id, size_t linenum);
         fp_entry* t_div(fp_entry* a, fp_entry* b, size_t site_id, size_t linenum);
+        fp_entry* t_sqrt(fp_entry* a, size_t site_id, size_t linenum);
         void t_store(void* addr, fp_entry* y, size_t site_id, size_t linenum);
         fp_entry* t_load(void* addr, size_t site_id, size_t linenum);
         void backtrack(fp_entry* x, int ind);
@@ -142,6 +143,20 @@ class TempContext {
         void PropDivError(double a, double da, double b, double db, double& x, double& dx) {
             TwoDiv(a, b, x, dx);
             dx = (da - dx - x * db) / (b + db);
+        }
+
+        void PropSqrtError(double a, double da, double& x, double& dx) {
+            SquareRoot(a, x, dx);
+            if (x != 0.0) {
+                dx = (da + dx) / (2.0 * x);
+            }
+            else {
+                double ap = a + da;
+                if (ap < 0.0) {
+                    dx = numeric_limits<double>::quiet_NaN();
+                }
+                dx = sqrt(ap) - x;
+            }
         }
 };
 

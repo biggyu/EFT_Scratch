@@ -8,7 +8,7 @@
 #include <map>
 using namespace std;
 
-enum class fp_op : uint32_t { INIT, LOAD, STORE, ADD, SUB, MUL, DIV, UNKNOWN };
+enum class fp_op : uint32_t { INIT, LOAD, STORE, ADD, SUB, MUL, DIV, SQRT, UNKNOWN };
 namespace eft {
     
 struct fp_entry {

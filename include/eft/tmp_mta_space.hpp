@@ -90,7 +90,32 @@ class TempContext {
         fp_entry* t_div(fp_entry* a, fp_entry* b, size_t site_id, size_t linenum);
         fp_entry* t_sqrt(fp_entry* a, size_t site_id, size_t linenum);
         void t_store(void* addr, fp_entry* y, size_t site_id, size_t linenum);
-        fp_entry* t_load(void* addr, size_t site_id, size_t linenum);
+        // fp_entry* t_load(void* addr, size_t site_id, size_t linenum);
+        template <typename T>
+        fp_entry* t_load(T* addr, size_t site_id, size_t linenum) {
+            double v = static_cast<double>(*reinterpret_cast<T*>(addr));
+            fp_entry* s = smem->peek(addr);
+            fp_entry* y = alloc();
+            if(s->value == v) {
+                y->value = s->value;
+                y->error = s->error;
+                y->lhs = s->lhs;
+                y->rhs = s->rhs;
+                y->opcode = s->opcode;
+                y->linenum = s->linenum;
+            }
+            else {
+                y->value = v;
+                y->error = 0.0;
+                y->lhs = nullptr;
+                y->rhs = nullptr;
+                y->opcode = fp_op::LOAD;
+                y->linenum = linenum;
+            }
+            y->static_id = site_id;
+            lwm[site_id] = {y, y->timestamp};
+            return y;
+        }
         void backtrack(fp_entry* x, int ind);
         void dump_sum();
         void dump_tracing(fp_entry* x);

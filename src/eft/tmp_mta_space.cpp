@@ -251,30 +251,30 @@ void TempContext::t_store(void* addr, fp_entry* y, size_t site_id, size_t linenu
     inc_ts();
 }
 
-fp_entry* TempContext::t_load(void* addr, size_t site_id, size_t linenum) {
-    double v = static_cast<double>(*reinterpret_cast<float*>(addr)); //TODO: use Template for generalization
-    fp_entry* s = smem->peek(addr);
-    fp_entry* y = alloc();
-    if(s->value == v) {
-        y->value = s->value;
-        y->error = s->error;
-        y->lhs = s->lhs;
-        y->rhs = s->rhs;
-        y->opcode = s->opcode;
-        y->linenum = s->linenum;
-    }
-    else {
-        y->value = v;
-        y->error = 0.0;
-        y->lhs = nullptr;
-        y->rhs = nullptr;
-        y->opcode = fp_op::LOAD;
-        y->linenum = linenum;
-    }
-    y->static_id = site_id;
-    lwm[site_id] = {y, y->timestamp};
-    return y;
-}
+// fp_entry* TempContext::t_load(void* addr, size_t site_id, size_t linenum) {
+//     double v = static_cast<double>(*reinterpret_cast<float*>(addr)); //TODO: use Template for generalization
+//     fp_entry* s = smem->peek(addr);
+//     fp_entry* y = alloc();
+//     if(s->value == v) {
+//         y->value = s->value;
+//         y->error = s->error;
+//         y->lhs = s->lhs;
+//         y->rhs = s->rhs;
+//         y->opcode = s->opcode;
+//         y->linenum = s->linenum;
+//     }
+//     else {
+//         y->value = v;
+//         y->error = 0.0;
+//         y->lhs = nullptr;
+//         y->rhs = nullptr;
+//         y->opcode = fp_op::LOAD;
+//         y->linenum = linenum;
+//     }
+//     y->static_id = site_id;
+//     lwm[site_id] = {y, y->timestamp};
+//     return y;
+// }
 
 void TempContext::dump_sum() {
     smem->dump_summary();

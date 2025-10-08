@@ -223,6 +223,28 @@ fp_entry* TempContext::t_div(fp_entry* a, fp_entry* b, size_t site_id, size_t li
     return z;
 }
 
+fp_entry* TempContext::t_sqrt(fp_entry* a, size_t site_id, size_t linenum) {
+    fp_entry* z = alloc();
+    lwrm_value a_lwm = lwm[a->static_id];
+    double a_error, b_error, x, dx;
+    if(a_lwm.ts == a_lwm.addr->timestamp) {
+        z->lhs = a_lwm.addr;
+        a_error = a_lwm.addr->error;
+    }
+    else {
+        z->lhs = nullptr;
+        a_error = 0.0;
+    }
+    PropSqrtError(a->value, a_error, x, dx);
+    z->value = x;
+    z->error = dx;
+    z->opcode = fp_op::SQRT;
+    z->linenum = linenum;
+    z->static_id = site_id;
+    lwm[site_id] = {z, z->timestamp};
+    return z;
+}
+
 void TempContext::t_store(void* addr, fp_entry* y, size_t site_id, size_t linenum) {
     lwrm_value y_lwm = lwm[y->static_id];
     fp_entry& m = smem->on_store(addr, y_lwm.addr);

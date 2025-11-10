@@ -24,17 +24,25 @@ target_include_directories(eft
   PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
-
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
 # ---------- Tests ----------
 if (EFT_BUILD_TESTS)
-    add_executable(gausselm tests/gausselm.c)
+  # Collect all .cpp and .c files in tests/ (non-recursive)
+  file(GLOB TEST_SOURCES CONFIGURE_DEPENDS tests/*.cpp tests/*.c)
 
-    add_executable(gausselm_eft tests/gausselm_eft.cpp)
-    target_link_libraries(gausselm_eft PRIVATE eft)
+  foreach(test_src ${TEST_SOURCES})
+    get_filename_component(test_name ${test_src} NAME_WE)
+    add_executable(${test_name} ${test_src})
 
-#   add_executable(benchmark_plain tests/fpcore/benchmark.c)
-#   target_link_libraries(benchmark_plain PRIVATE m)
+    # Send this target’s binary to build/tests/
+    set_target_properties(${test_name} PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests
+    )
 
-#   add_executable(benchmark_eft tests/fpcore/benchmark_eft.cpp)
-#   target_link_libraries(benchmark_eft PRIVATE eft)
+    if (test_src MATCHES "\\.cpp$")
+        target_link_libraries(${test_name} PRIVATE eft)
+    else()
+        target_link_libraries(${test_name} PRIVATE m)
+    endif()
+  endforeach()
 endif()
